@@ -3,10 +3,13 @@ import FastImage from 'react-native-fast-image';
 import { Receipt21, Clock, Message } from 'iconsax-react-native';
 import React from 'react';
 import { fontType, colors } from '../assets/theme';
+import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const ItemVertical = ({ item }) => {
+    const navigation = useNavigation();
     return (
-        <View style={styles.cardItem}>
+        <TouchableOpacity style={styles.cardItem} onPress={() => navigation.navigate('Blogdetail', { blogId: item.id })}>
             <FastImage
                 style={styles.cardImage}
                 source={{
@@ -16,9 +19,11 @@ const ItemVertical = ({ item }) => {
                 }}
                 resizeMode={FastImage.resizeMode.cover}
             />
-        </View>
+        </TouchableOpacity>
     );
 };
+
+
 
 export default ItemVertical;
 const styles = StyleSheet.create({

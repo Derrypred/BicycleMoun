@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import { Receipt21 } from 'iconsax-react-native';
 import FastImage from 'react-native-fast-image';
 import { fontType, colors } from '../assets/theme';
+import { useNavigation } from '@react-navigation/native';
+
 const ItemHorizontal = ({ item, variant, onPress }) => {
+    const navigation = useNavigation();
     return (
-        <View style={itemHorizontal.cardItem}>
+        <TouchableOpacity style={itemHorizontal.cardItem} onPress={() => navigation.navigate('Blogdetail', { blogId: item.id })}>
             <FastImage
                 style={itemHorizontal.cardImage}
                 source={{
@@ -28,9 +31,11 @@ const ItemHorizontal = ({ item, variant, onPress }) => {
                     </View>
                 </View>
             </FastImage>
-        </View>
+        </TouchableOpacity>
     );
 };
+
+
 const ListHorizontal = ({ data }) => {
     const [bookmark, setBookmark] = useState([]);
     const toggleBookmark = itemId => {
