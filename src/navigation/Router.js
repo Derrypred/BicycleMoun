@@ -1,9 +1,11 @@
 import React from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, Discover, Bookmark, ContactUs, Blogdetail, FAQ } from '../screens';
-import { Home2, LocationDiscover, Receipt21, Call, MessageQuestion } from 'iconsax-react-native';
+import { Home, Discover, Bookmark, Category, Blogdetail, FAQ, AddCategoryForm } from '../screens';
+import { Home2, LocationDiscover, Receipt21, MessageQuestion, Category2 } from 'iconsax-react-native';
 import { fontType, colors } from '../assets/theme';
+import { CategoryList } from '../../data';
+import { Searchbar } from '../components';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -72,12 +74,12 @@ function MainApp() {
                 }}
             />
             <Tab.Screen
-                name="ContactUs"
-                component={ContactUs}
+                name="Category"
+                component={Category}
                 options={{
-                    tabBarLabel: 'ContactUs',
+                    tabBarLabel: 'Category',
                     tabBarIcon: ({ focused, color }) => (
-                        <Call
+                        <Category2
                             color={color}
                             variant={focused ? 'Bold' : 'Linear'}
                             size={24}
@@ -115,6 +117,18 @@ const Router = () => {
             <Stack.Screen
                 name="Blogdetail"
                 component={Blogdetail}
+                options={{
+                    headerShown: false,
+                    animationEnabled: true,
+                    animationTypeForReplace: 'pop',
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
+                    ...TransitionPresets.SlideFromRightIOS,
+                }}
+            />
+            <Stack.Screen
+                name="AddCategory"
+                component={AddCategoryForm}
                 options={{
                     headerShown: false,
                     animationEnabled: true,
