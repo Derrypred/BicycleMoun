@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, Discover, Bookmark, Category, Blogdetail, FAQ, AddCategoryForm } from '../screens';
+import { Home, Discover, Bookmark, Category, Blogdetail, FAQ, AddCategoryForm, EditCategoryForm } from '../screens';
 import { Home2, LocationDiscover, Receipt21, MessageQuestion, Category2 } from 'iconsax-react-native';
 import { fontType, colors } from '../assets/theme';
 import { CategoryList } from '../../data';
@@ -127,8 +127,20 @@ const Router = () => {
                 }}
             />
             <Stack.Screen
-                name="AddCategory"
+                name="AddCategoryForm"
                 component={AddCategoryForm}
+                options={{
+                    headerShown: false,
+                    animationEnabled: true,
+                    animationTypeForReplace: 'pop',
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
+                    ...TransitionPresets.SlideFromRightIOS,
+                }}
+            />
+            <Stack.Screen
+                name="EditCategory"
+                component={EditCategoryForm}
                 options={{
                     headerShown: false,
                     animationEnabled: true,

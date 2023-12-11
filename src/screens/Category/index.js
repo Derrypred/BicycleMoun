@@ -1,34 +1,62 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, TextInput } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, TextInput, ActivityIndicator, RefreshControl } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { Setting2, Edit } from "iconsax-react-native";
-import { useNavigation } from "@react-navigation/native";
-
-const categoriesData = [
-    { id: '1', name: 'Sepeda Gunung All Mountain', image: 'https://ds393qgzrxwzn.cloudfront.net/resize/m720x480/cat1/img/images/0/KM949PDzV1.jpg' },
-    { id: '2', name: 'Sepeda Gunung Freeride', image: 'https://ds393qgzrxwzn.cloudfront.net/resize/m720x480/cat1/img/images/0/p2lKg3oSY9.jpg' },
-    { id: '3', name: 'Sepeda Gunung Downhill', image: 'https://ds393qgzrxwzn.cloudfront.net/resize/m720x480/cat1/img/images/0/rbJZR3kHHt.jpg' },
-    { id: '4', name: 'Sepeda Gunung Cross Country', image: 'https://ds393qgzrxwzn.cloudfront.net/resize/m720x480/cat1/img/images/0/MOZsDjqhuL.jpg' },
-    { id: '5', name: 'United Radiant XCP', image: 'https://ds393qgzrxwzn.cloudfront.net/resize/m720x480/cat1/img/images/0/cmiYKFctWg.jpg' },
-    // Tambahkan kategori sepeda lainnya sesuai kebutuhan
-];
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { fontType, colors } from '../../assets/theme';
+import axios from 'axios';
 
 const App = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchText, setSearchText] = useState('');
     const navigation = useNavigation();
 
-    const filteredCategories = categoriesData.filter(category =>
-        category.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={[styles.categoryItem, selectedCategory === item.id && styles.selectedCategory]}
             onPress={() => setSelectedCategory(item.id)}
         >
-            <Image source={{ uri: item.image }} style={styles.categoryImage} />
+            <FastImage
+                style={styles.categoryImage}
+                source={{
+                    uri: item?.image,
+                    headers: { Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.high,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+            />
             <Text style={styles.categoryText}>{item.name}</Text>
         </TouchableOpacity>
+    );
+
+    const [loading, setLoading] = useState(true);
+    const [blogData, setBlogData] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const getDataBlog = async () => {
+        try {
+            const response = await axios.get(
+                'https://656bd06ee1e03bfd572dd83d.mockapi.io/blog',
+            );
+            setBlogData(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            getDataBlog();
+            setRefreshing(false);
+        }, 1500);
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            getDataBlog();
+        }, [])
     );
 
     return (
@@ -40,29 +68,29 @@ const App = () => {
                 value={searchText}
                 onChangeText={text => setSearchText(text)}
             />
-            <FlatList
-                data={filteredCategories}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-            />
-            {selectedCategory && (
-                <View style={styles.selectedCategoryContainer}>
-                    <Image source={{ uri: categoriesData.find(category => category.id === selectedCategory)?.image }} style={styles.selectedCategoryImage} />
-                    <Text style={styles.selectedCategoryText}>Anda memilih: {categoriesData.find(category => category.id === selectedCategory)?.name}</Text>
-                </View>
+
+            {loading ? (
+                <ActivityIndicator size="large" color={colors.yellow} />
+            ) : (
+                <FlatList
+                    data={blogData}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                />
             )}
+
             <TouchableOpacity
                 style={styles.floatingButton}
-                onPress={() => navigation.navigate("AddCategory")}
+                onPress={() => navigation.navigate("AddCategoryForm")}
             >
                 <Edit color='black' variant="Linear" size={15} />
             </TouchableOpacity>
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -78,7 +106,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     searchInput: {
-        backgroundColor: 'white',
+        backgroundColor: 'black',
         width: '100%',
         padding: 10,
         marginBottom: 16,
@@ -95,8 +123,8 @@ const styles = StyleSheet.create({
     categoryImage: {
         width: 150,
         height: 100,
-        borderRadius: 50,
-        marginBottom: 8,
+        borderRadius: 20,
+        marginBottom: 10,
     },
     categoryText: {
         fontSize: 16,
@@ -111,13 +139,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     selectedCategoryImage: {
-        width: 150,
-        height: 100,
+        width: 350,
+        height: 300,
         borderRadius: 1,
         marginBottom: 8,
     },
     selectedCategoryText: {
-        fontSize: 11,
+        fontSize: 21,
         fontWeight: 'bold',
         color: 'grey',
     },
@@ -125,7 +153,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'yellow',
         padding: 13,
         position: 'absolute',
-        bottom: 35,
+        bottom: 75,
         right: 5,
         borderRadius: 10,
         shadowColor: 'red',
