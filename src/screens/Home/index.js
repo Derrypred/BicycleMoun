@@ -1,45 +1,10 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, Image, ImageBackground, FlatList, TouchableOpacity } from 'react-native';
-import { Notification, Receipt21, Clock, Message, Receipt1, ReceiptSearch, ReceiptSquare, Component } from 'iconsax-react-native';
-import { fontType, colors } from '../../../src/assets/theme';
-import { ListHorizontal, ItemVertical } from '../../../src/components';
-import { Element3 } from 'iconsax-react-native';
-import { BlogList, CategoryList } from '../../../data';
-
-export default function Home() {
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>BicycleMount!</Text>
-                <Element3 color={colors.white()} variant="Linear" size={24} />
-            </View>
-            <ListBlog />
-
-        </View>
-    );
-}
-
-const ListBlog = () => {
-    const horizontalData = BlogList.slice(0, 5);
-    const verticalData = BlogList.slice(5);
-    return (
-        <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.listBlog}>
-                <ListHorizontal data={horizontalData} />
-                <View style={styles.listCategory}>
-                    <FlatListCategory />
-                </View>
-                <View style={styles.listCard}>
-                    {verticalData.map((item, index) => (
-                        <ItemVertical item={item} key={index} />
-                    ))}
-                </View>
-            </View>
-        </ScrollView>
-    );
-};
-
-
+import React, { useState, useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Notification } from 'iconsax-react-native';
+import { CategoryList } from '../../../data';
+import { ItemVertical, ListHorizontal } from '../../components';
+import { fontType, colors } from '../../assets/theme';
+import firestore from '@react-native-firebase/firestore';
 const ItemCategory = ({ item, onPress, color }) => {
     return (
         <TouchableOpacity onPress={onPress}>
@@ -49,7 +14,6 @@ const ItemCategory = ({ item, onPress, color }) => {
         </TouchableOpacity>
     );
 };
-
 const FlatListCategory = () => {
     const [selected, setSelected] = useState(1);
     const renderItem = ({ item }) => {
@@ -75,11 +39,67 @@ const FlatListCategory = () => {
     );
 };
 
+const Home = () => {
+    const [loading, setLoading] = useState(true);
+    const [blogData, setBlogData] = useState([]);
+    useEffect(() => {
+        const fetchBlogData = () => {
+            try {
+                const blogCollection = firestore().collection('blog');
+                const unsubscribeBlog = blogCollection.onSnapshot(querySnapshot => {
+                    const blogs = querySnapshot.docs.map(doc => ({
+                        ...doc.data(),
+                        id: doc.id,
+                    }));
+                    setBlogData(blogs);
+                    setLoading(false);
+                });
+
+                return () => {
+                    unsubscribeBlog();
+                };
+            } catch (error) {
+                console.error('Error fetching blog data:', error);
+            }
+        };
+        fetchBlogData();
+    }, []);
+
+    const horizontalData = blogData.slice(0, 5);
+    const verticalData = blogData.slice(5);
+    return (
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.title}>BicycleMount.</Text>
+                <Notification color={colors.black()} variant="Linear" size={24} />
+            </View>
+            <View style={styles.listCategory}>
+                <FlatListCategory />
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {loading ? (
+                        <ActivityIndicator size={'large'} color={colors.blue()} />
+                    ) : (
+                        <View style={styles.listBlog}>
+                            <ListHorizontal data={horizontalData} />
+                            <View style={styles.listCard}>
+                                {verticalData.map((item, index) => (
+                                    <ItemVertical item={item} key={index} />
+                                ))}
+                            </View>
+                        </View>
+                    )}
+                </ScrollView>
+            </View>
+        </View>
+    );
+};
+
+export default Home;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.darkModeBlack()
+        backgroundColor: colors.black(),
     },
     header: {
         paddingHorizontal: 24,
@@ -89,7 +109,7 @@ const styles = StyleSheet.create({
         height: 52,
         elevation: 8,
         paddingTop: 8,
-        paddingBottom: 4
+        paddingBottom: 4,
     },
     title: {
         fontSize: 20,
@@ -115,7 +135,7 @@ const category = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 25,
         alignItems: 'center',
-        backgroundColor: colors.grey(0.08),
+        backgroundColor: colors.white(0.08),
     },
     title: {
         fontFamily: fontType['Pjs-SemiBold'],

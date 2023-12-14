@@ -6,4 +6,7 @@ import Category from "./Category";
 import FAQ from "./FAQ";
 import AddCategoryForm from "./AddCategoryForm";
 import EditCategoryForm from "./EditCategoryForm";
-export { Home, Blogdetail, Discover, Bookmark, Category, FAQ, AddCategoryForm, EditCategoryForm }
+import Login from "./Login";
+import Register from "./Register";
+import SplashScreen from "./SplashScreen";
+export { Home, Blogdetail, Discover, Bookmark, Category, FAQ, AddCategoryForm, EditCategoryForm, Login, Register, SplashScreen }

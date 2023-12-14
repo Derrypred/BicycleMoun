@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "980162268289",
+    "project_id": "bicyclemount",
+    "storage_bucket": "bicyclemount.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980162268289:android:bcb3677de74a055df29180",
+        "android_client_info": {
+          "package_name": "com.campoutdoor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYWZGKdVafvk6j2msGqTra1sNZ5P7NWwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
